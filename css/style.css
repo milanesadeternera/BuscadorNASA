@@ -1,0 +1,25 @@
+main {
+    min-height: calc(100vh - 160px);
+}
+
+#spinner{
+  display: none;
+}
+
+.image-container{
+  width: 300px; /* Ancho del área visible */
+  height: 200px; /* Alto del área visible */
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  margin: 10px auto;
+  cursor: pointer;
+}
+.img-modal{
+  position: relative;
+}
+
+.card-body{
+  max-height: 200px;
+  overflow-y: auto;
+}
