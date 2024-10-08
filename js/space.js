@@ -15,93 +15,104 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function search(){
+    //Borro todo lo que hay en contenedor
+    document.getElementById("contenedor").innerHTML = "";
+
     //Muestro spinner
     document.getElementById("spinner").style.display="block";
     let input = document.getElementById("inputBuscar").value;
     if(input != ""){
-        data = await fetch(URL+"search?q="+input)
-        .then(response => response.json())
-        .then(data => 
-            //chequear que no sea vacio
-            data.collection);
+        let response = await getData(URL+"search?q="+input);
+        data = response.collection;
     }
     displayData(data);
 }
 
 function displayData(collection){
     let items = collection.items;
-    console.log("displayData:", items.length)
+    console.log("displayData:", items.length);
+    let contenedor = document.getElementById("contenedor");
     let content = '';
 
     //oculto spinner
     document.getElementById("spinner").style.display="none";
 
-    items.forEach(item => {
-        try{
-            switch(item.data[0].media_type){
-                case "image":
-                    //El elemento es una imagen
-                    content = `
-                    <div class="card col-3 mx-2 mt-2" >
-                    <div class="image-container img-thumbnail mb-1">
-                        <img src="${item.links[0].href}" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
-                    </div>
-                    <div class="card-body">
-                    <span class="badge bg-primary">image</span>
-                    <h5 class="card-title">${item.data[0].title}</h5>
-                    <p class="card-text">${item.data[0].description}</p>
-                    </div>
+    if(items.length == 0){
+        //No hay coincidencias en la busqueda.
+        content= `
+        <div class="alert alert-danger" role="alert">
+        No se encontraron resultados en la busqueda
+        </div>`
+        contenedor.innerHTML = content;
+    }else{
+        //Muestro resultados
+        items.forEach(item => {
+            try{
+                switch(item.data[0].media_type){
+                    case "image":
+                        //El elemento es una imagen
+                        content = `
+                        <div class="card col-3 mx-2 mt-2" >
+                        <div class="image-container img-thumbnail mb-1">
+                            <img src="${item.links[0].href}" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
+                        </div>
+                        <div class="card-body">
+                        <span class="badge bg-primary">image</span>
+                        <h5 class="card-title">${item.data[0].title}</h5>
+                        <p class="card-text">${item.data[0].description}</p>
+                        </div>
+                        </div>`;
+                        contenedor.insertAdjacentHTML('beforeend', content);
+
+                    break;
+                    case "video":
+                        //El elemento es un video
+                        content = `
+                        <div class="card col-3 mx-2 mt-2" >
+                        <div class="image-container img-thumbnail mb-1" >
+                            <img src="${item.links[0].href}" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
+                        </div>
+                        <div class="card-body">
+                        <span class="badge bg-success">video</span>
+                        <h5 class="card-title">${item.data[0].title}</h5>
+                        <p class="card-text">${item.data[0].description}</p>
+                        </div>
                     </div>`;
-                document.getElementById("contenedor").insertAdjacentHTML('beforeend', content);
-
-                break;
-                case "video":
-                    //El elemento es un video
-                    content = `
-                    <div class="card col-3 mx-2 mt-2" >
-                    <div class="image-container img-thumbnail mb-1" >
-                        <img src="${item.links[0].href}" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
-                    </div>
-                    <div class="card-body">
-                    <span class="badge bg-success">video</span>
-                    <h5 class="card-title">${item.data[0].title}</h5>
-                    <p class="card-text">${item.data[0].description}</p>
-                    </div>
-                </div>`;
-                document.getElementById("contenedor").insertAdjacentHTML('afterbegin', content);
-                break;
-                case "audio":
-                    //contenido es audio
-                    content = `
-                    <div class="card col-3 mx-2 mt-2" >
-                    <div class="image-container img-thumbnail mb-1" >
-                        <img src="audio.png" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
-                    </div>
-                    <div class="card-body">
-                    <span class="badge bg-warning text-dark">Audio</span>
-                    <h5 class="card-title">${item.data[0].title}</h5>
-                    <p class="card-text">${item.data[0].description}</p>
-                    </div>
-                </div>`;
-                document.getElementById("contenedor").insertAdjacentHTML('afterbegin', content);
-                break;
-                default:
-                    //no encontre el tipo de elemento
-                    console.log("Otro media_type:",item);
+                    contenedor.insertAdjacentHTML('afterbegin', content);
+                    break;
+                    case "audio":
+                        //contenido es audio
+                        content = `
+                        <div class="card col-3 mx-2 mt-2" >
+                        <div class="image-container img-thumbnail mb-1" >
+                            <img src="audio.png" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
+                        </div>
+                        <div class="card-body">
+                        <span class="badge bg-warning text-dark">Audio</span>
+                        <h5 class="card-title">${item.data[0].title}</h5>
+                        <p class="card-text">${item.data[0].description}</p>
+                        </div>
+                    </div>`;
+                    contenedor.insertAdjacentHTML('afterbegin', content);
+                    break;
+                    default:
+                        //no encontre el tipo de elemento
+                        console.log("Otro media_type:",item);
+                }
+            } catch (error){
+                console.log("error al display:",item)
             }
-        } catch (error){
-            console.log("error al display:",item)
-        }
-
-
-    });
+        });
 }
+}
+
 let videoLinks =" ";
 async function displayModal(id){
     console.log("displayModal:",id);
     let item = data.items.filter((item) => item.data[0].nasa_id == id );
     item = item[0];
     console.log("displayModal item:", item)
+    let content = "";
 
     //creo contenido.
     switch(item.data[0].media_type){
@@ -124,7 +135,18 @@ async function displayModal(id){
                 Your browser does not support the video tag.
             </video>
             </div>`;
-
+        break;
+        case "audio":
+            //Es un audio
+            console.log("audio")
+            let audioLinks = await getData(item.href);
+            console.log("displayModal audio links:", audioLinks.length, " audio links");
+            let audioLink = audioLinks.filter((link)=>link.includes("128k.mp3"));
+            content = `
+            <audio controls>
+                <source src="${audioLink}" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>`
         break;
         default: console.log("displayModal error switch");
     }
@@ -138,6 +160,7 @@ async function displayModal(id){
     myModal.show();
 }
 
+//Funcion para cerrar el modal cuando se está reproduciendo video y limpiar contenido
 function closeModal(){
     let myModal = new bootstrap.Modal(document.getElementById('detailModal'));
     let video = document.getElementById("modalVideo");
