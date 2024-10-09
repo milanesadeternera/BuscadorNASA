@@ -46,7 +46,10 @@ function displayData(collection){
         contenedor.innerHTML = content;
     }else{
         //Muestro resultados
-        items.forEach(item => {
+        //Hacemos for para usar el i como id para recuperar elemento al abrir modal
+        //El json no trae id, y el nasa_id trae a veces comillas que no puedo parsear bien.
+        for(i=0; i < items.length;i++){
+            let item = items[i];
             try{
                 switch(item.data[0].media_type){
                     case "image":
@@ -70,7 +73,7 @@ function displayData(collection){
                         content = `
                         <div class="card col-3 mx-2 mt-2" >
                         <div class="image-container img-thumbnail mb-1" >
-                            <img src="${item.links[0].href}" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
+                            <img src="${item.links[0].href}" class="card-img-top image" onclick="displayModal('${i}')">
                         </div>
                         <div class="card-body">
                         <span class="badge bg-success">video</span>
@@ -85,7 +88,7 @@ function displayData(collection){
                         content = `
                         <div class="card col-3 mx-2 mt-2" >
                         <div class="image-container img-thumbnail mb-1" >
-                            <img src="audio.png" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
+                            <img src="audio.png" class="card-img-top image" onclick="displayModal('${i}')">
                         </div>
                         <div class="card-body">
                         <span class="badge bg-warning text-dark">Audio</span>
@@ -100,17 +103,17 @@ function displayData(collection){
                         console.log("Otro media_type:",item);
                 }
             } catch (error){
-                console.log("error al display:",item)
+                console.log("error al display:",item, i);
             }
-        });
+        };
 }
 }
 
 let videoLinks =" ";
 async function displayModal(id){
     console.log("displayModal:",id);
-    let item = data.items.filter((item) => item.data[0].nasa_id == id );
-    item = item[0];
+    let item = data.items[id];
+    //item = item[0];
     console.log("displayModal item:", item)
     let content = "";
 
