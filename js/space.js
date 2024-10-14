@@ -57,7 +57,7 @@ function displayData(collection){
                         content = `
                         <div class="card col-3 mx-2 mt-2" >
                         <div class="image-container img-thumbnail mb-1">
-                            <img src="${item.links[0].href}" class="card-img-top image" onclick="displayModal('${item.data[0].nasa_id}')">
+                            <img src="${item.links[0].href}" class="card-img-top image" onclick="displayModal('${i}')">
                         </div>
                         <div class="card-body">
                         <span class="badge bg-primary">image</span>
